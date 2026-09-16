@@ -295,6 +295,12 @@
     font-size: 14px;
   }
 
+  .results .best-line {
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
   .results .verdict {
     font-weight: 600;
     margin-bottom: 18px;
@@ -357,11 +363,13 @@
     <div class="emoji" id="result-emoji">🎉</div>
     <h2 id="result-title">Great job!</h2>
     <div class="score-line" id="result-score"></div>
+    <div class="score-line best-line hidden" id="result-best-score"></div>
     <div class="verdict" id="result-verdict"></div>
     <button class="retry-btn" id="retry-btn">Play Again</button>
   </div>
 </div>
 
+<script src="best-score.js"></script>
 <script>
   const questions = [
     {
@@ -430,6 +438,7 @@
   const quizCard = document.getElementById('quiz-card');
   const resultsCard = document.getElementById('results-card');
   const retryBtn = document.getElementById('retry-btn');
+  const resultBestScore = document.getElementById('result-best-score');
 
   function loadQuestion() {
     answered = false;
@@ -489,6 +498,9 @@
   function showResults() {
     quizCard.classList.add('hidden');
     resultsCard.classList.remove('hidden');
+    const bestScoreState = window.bestScoreUtils
+      ? window.bestScoreUtils.updateBestScore(score)
+      : { bestScore: null, isNewBest: false };
 
     const pct = score / questions.length;
     let emoji, title, verdict;
@@ -507,6 +519,13 @@
     document.getElementById('result-emoji').textContent = emoji;
     document.getElementById('result-title').textContent = title;
     document.getElementById('result-score').textContent = `You scored ${score} out of ${questions.length}`;
+    if (bestScoreState.bestScore !== null) {
+      resultBestScore.textContent = `Best: ${bestScoreState.bestScore} / ${questions.length}`;
+      resultBestScore.classList.remove('hidden');
+    } else {
+      resultBestScore.textContent = '';
+      resultBestScore.classList.add('hidden');
+    }
     document.getElementById('result-verdict').textContent = verdict;
   }
 
